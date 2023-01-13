@@ -1,0 +1,7 @@
+@openzeppelin/=node_modules/@openzeppelin/
+arb-bridge-eth/=node_modules/arb-bridge-eth/
+arbos-precompiles/=node_modules/arbos-precompiles/
+ds-test/=lib/solmate/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+hardhat/=node_modules/hardhat/
+solmate/=lib/solmate/src/

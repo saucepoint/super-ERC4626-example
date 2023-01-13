@@ -6,6 +6,7 @@ import {IInbox, IBridge} from "../interfaces/IInbox.sol";
 import {ETHVault} from "../ETHVault.sol";
 
 contract MainnetETHVault is ETHVault {
+    uint256 public sweepCounter;
     address public l2Target;
     IInbox public immutable inbox;
 
@@ -26,7 +27,7 @@ contract MainnetETHVault is ETHVault {
         emit RetryableTicketCreated(ticketID);
     }
 
-    /// @notice only l2Target can update greeting
+    /// @notice only l2Target can call this
     function sweep() public override {
         IBridge bridge = inbox.bridge();
         // this prevents reentrancies on L2 to L1 txs
@@ -36,5 +37,11 @@ contract MainnetETHVault is ETHVault {
         require(l2Sender == l2Target, "Greeting only updateable by L2");
 
         // sweep the ether
+        sweepCounter++;
+    }
+
+    /// @notice Call setTotalAssetsInL2() to trigger this function on L2
+    function setTotalAssets(uint256) public pure override {
+        require(false, "setTotalAssets() not implemented on L1");
     }
 }

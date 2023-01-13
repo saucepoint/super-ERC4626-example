@@ -35,4 +35,21 @@ contract ETHVaultTest is Test {
         assertEq(ethVault.totalAssets(), 2 ether);
         assertEq(ethVault.previewRedeem(aliceBalance), 2 ether);
     }
+
+    function testWithdraw() public {
+        vm.startPrank(alice);
+        weth.approve(address(ethVault), 1 ether);
+        ethVault.deposit(1 ether, alice);
+
+        uint256 aliceBalance = ethVault.balanceOf(alice);
+        assertEq(aliceBalance, 1 ether);
+
+        assertEq(ethVault.totalAssets(), 2 ether);
+        assertEq(ethVault.previewRedeem(aliceBalance), 2 ether);
+
+        ethVault.redeem(aliceBalance, alice, alice);
+
+        assertEq(ethVault.totalAssets(), 0);
+        assertEq(weth.balanceOf(alice), 2 ether);
+    }
 }

@@ -20,7 +20,7 @@ contract ArbETHVault is ETHVault {
     }
 
     /// @notice only L1 contract can set totalAssets
-    function setTotalAssets(uint256 _totalAssets) public {
+    function setTotalAssets(uint256 _totalAssets) public override {
         require(msg.sender == l1Target, "only L1 contract can set totalAssets");
         // AddressAliasHelper.applyL1ToL2Alias(l1Target);
         _totalAssetsL1 = _totalAssets;

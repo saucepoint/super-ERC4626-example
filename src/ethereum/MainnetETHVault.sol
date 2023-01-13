@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "arb-bridge-eth/contracts/bridge/Inbox.sol";
-import "arb-bridge-eth/contracts/bridge/Outbox.sol";
+import {IOutbox} from "../interfaces/IOutbox.sol";
+import {IInbox, IBridge} from "../interfaces/IInbox.sol";
 import {ETHVault} from "../ETHVault.sol";
 
 contract MainnetETHVault is ETHVault {
     address public l2Target;
-    // IInbox public immutable inbox;
+    IInbox public immutable inbox;
 
     event RetryableTicketCreated(uint256 indexed ticketId);
 
     constructor(address _weth, address _l2Target, address _inbox) ETHVault(_weth) {
         l2Target = _l2Target;
-        // inbox = IInbox(_inbox);
+        inbox = IInbox(_inbox);
     }
 
     function setTotalAssetsInL2(uint256 maxSubmissionCost, uint256 maxGas, uint256 gasPriceBid) public {
@@ -27,7 +27,7 @@ contract MainnetETHVault is ETHVault {
     }
 
     /// @notice only l2Target can update greeting
-    function setGreeting(string memory _greeting) public override {
+    function sweep() public override {
         IBridge bridge = inbox.bridge();
         // this prevents reentrancies on L2 to L1 txs
         require(msg.sender == address(bridge), "NOT_BRIDGE");
@@ -35,8 +35,6 @@ contract MainnetETHVault is ETHVault {
         address l2Sender = outbox.l2ToL1Sender();
         require(l2Sender == l2Target, "Greeting only updateable by L2");
 
-        Greeter.setGreeting(_greeting);
+        // sweep the ether
     }
-
-    function sweep() public override {}
 }

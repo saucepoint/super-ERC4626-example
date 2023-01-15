@@ -5,14 +5,14 @@ import "arbos-precompiles/arbos/builtin/ArbSys.sol";
 import {ETHVault} from "../ETHVault.sol";
 import {WETH} from "solmate/tokens/WETH.sol";
 
-//import "@arbitrum/nitro-contracts/src/libraries/AddressAliasHelper.sol";
-
 contract ArbETHVault is ETHVault {
     uint256 internal _totalAssetsL1;
     address public l1Target;
-    ArbSys constant arbsys = ArbSys(address(100));
+    ArbSys constant arbsys = ArbSys(address(0x0000000000000000000000000000000000000064));
 
-    constructor(address _weth, address _l1Target) ETHVault(_weth) {
+    constructor(address _weth) ETHVault(_weth) {}
+
+    function setL1Target(address _l1Target) public {
         l1Target = _l1Target;
     }
 
@@ -52,7 +52,8 @@ contract ArbETHVault is ETHVault {
     // ---------------------------------
     /// @notice only L1 contract can set totalAssets
     function setTotalAssets(uint256 _totalAssets) public override {
-        require(msg.sender == l1Target, "only L1 contract can set totalAssets");
+        // TODO:
+        // require(msg.sender == l1Target, "only L1 contract can set totalAssets");
         // AddressAliasHelper.applyL1ToL2Alias(l1Target);
         _totalAssetsL1 = _totalAssets;
     }

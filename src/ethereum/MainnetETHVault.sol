@@ -17,11 +17,13 @@ contract MainnetETHVault is ETHVault {
         inbox = IInbox(_inbox);
     }
 
-    function setTotalAssetsInL2(uint256 maxSubmissionCost, uint256 maxGas, uint256 gasPriceBid) public {
-        uint256 _totalAssets = totalAssets();
+    function setTotalAssetsInL2(uint256 maxSubmissionCost, uint256 maxGas, uint256 gasPriceBid) public payable {
+        // caller must send enough ETH to pay for the L2 tx
+        // we'll need to subtract msg.value from totalAssets
+        uint256 _totalAssets = totalAssets() - msg.value;
         bytes memory data = abi.encodeWithSelector(ETHVault.setTotalAssets.selector, _totalAssets);
 
-        uint256 ticketID = inbox.createRetryableTicket{value: 0}(
+        uint256 ticketID = inbox.createRetryableTicket{value: msg.value}(
             l2Target, 0, maxSubmissionCost, msg.sender, msg.sender, maxGas, gasPriceBid, data
         );
         emit RetryableTicketCreated(ticketID);

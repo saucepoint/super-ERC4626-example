@@ -35,15 +35,15 @@ contract IntegrationTest is Test {
         arbVault.setL1Target(address(mainnetVault));
     }
 
-    // L1 --> L2 message, to update totalAssets()
-    function testUpdateTotalAssetsL2() public {
-        assertEq(true, true);
+    function testAutoSweep() public {
         // Deposit 1 ETH into L1 vault
-        // vm.selectFork(mainnetFork);
-        // vm.deal(address(mainnetVault), 1 ether);
+        vm.selectFork(mainnetFork);
+        vm.deal(address(alice), 1 ether);
+        assertEq(address(alice).balance, 1 ether);
 
-        // assertEq(mainnetVault.totalAssets(), 1 ether);
-
-        // mainnetVault.setTotalAssetsInL2(1 ether, 3_000_000, 500 gwei);
+        vm.startPrank(address(alice));
+        (bool sent,) = address(mainnetVault).call{value: 1 ether}("");
+        vm.stopPrank();
+        require(sent, "Failed to send Ether");
     }
 }

@@ -58,11 +58,14 @@ contract ArbETHVault is ETHVault {
         _totalAssetsL1 = _totalAssets;
     }
 
-    /// sweeps the ether into the L1 contract
+    /// sweeps the asset (pure ether) into the L1 contract
     function sweepToL1() public {
-        bytes memory data = abi.encodeWithSelector(ETHVault.sweep.selector);
-
-        arbsys.sendTxToL1(l1Target, data);
+        // the benefit of using sending pure ether is that we might not have
+        // to pick up the message on L1.
+        
+        // withdraw to L1
+        // receive() will then route the ether into the yield strategy
+        arbsys.withdrawEth(l1Target);
     }
 
     /// @notice Call sweepToL1() to trigger this function on L1

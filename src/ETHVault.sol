@@ -10,8 +10,8 @@ contract ETHVault is ERC4626 {
     using FixedPointMathLib for uint256;
 
     constructor(address _weth) ERC4626(ERC20(_weth), "ETH Vault", "ETHV") {}
-    fallback() external payable {}
-    receive() external payable {}
+    
+    receive() external virtual payable {}
 
     function totalAssets() public view virtual override returns (uint256) {
         return address(this).balance + asset.balanceOf(address(this));

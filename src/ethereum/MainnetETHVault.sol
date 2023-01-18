@@ -17,11 +17,11 @@ contract MainnetETHVault is ETHVault {
         inbox = IInbox(_inbox);
     }
 
-    receive() external override payable{
+    receive() external payable override {
         uint256 maxSubmissionCost = 0.25 ether;
         uint256 maxGas = 1_000_000;
         uint256 gasPriceBid = 10 gwei;
-    
+
         // caller must send enough ETH to pay for the L2 tx
         // we'll need to subtract msg.value from totalAssets
         uint256 _totalAssets = totalAssets() - msg.value;

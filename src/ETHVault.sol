@@ -9,9 +9,13 @@ import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 contract ETHVault is ERC4626 {
     using FixedPointMathLib for uint256;
 
-    constructor(address _weth) ERC4626(ERC20(_weth), "ETH Vault", "ETHV") {}
-    
-    receive() external virtual payable {}
+    WETH weth;
+
+    constructor(address _weth) ERC4626(ERC20(_weth), "ETH Vault", "ETHV") {
+        weth = WETH(payable(_weth));
+    }
+
+    receive() external payable virtual {}
 
     function totalAssets() public view virtual override returns (uint256) {
         return address(this).balance + asset.balanceOf(address(this));

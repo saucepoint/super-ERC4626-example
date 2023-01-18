@@ -3,12 +3,11 @@ pragma solidity ^0.8.13;
 
 import "arbos-precompiles/arbos/builtin/ArbSys.sol";
 import {ETHVault} from "../ETHVault.sol";
-import {WETH} from "solmate/tokens/WETH.sol";
 
 contract ArbETHVault is ETHVault {
     uint256 internal _totalAssetsL1;
     address public l1Target;
-    ArbSys constant arbsys = ArbSys(address(0x0000000000000000000000000000000000000064));
+    ArbSys internal arbsys = ArbSys(address(0x0000000000000000000000000000000000000064));
 
     constructor(address _weth) ETHVault(_weth) {}
 
@@ -32,9 +31,20 @@ contract ArbETHVault is ETHVault {
     // ---------------------------------
     // Entry mechanisms
     // ---------------------------------
-    function wrapAndDeposit() public payable {
-        WETH(payable(address(asset))).deposit{value: msg.value}();
-        deposit(msg.value, msg.sender);
+    function wrapAndDeposit() external payable returns (uint256 shares) {
+        uint256 amount = msg.value;
+        weth.deposit{value: msg.value}();
+
+        // logic taken from deposit(), but without the ERC20 transfer
+
+        // Check for rounding error since we round down in previewDeposit.
+        require((shares = previewDeposit(amount)) != 0, "ZERO_SHARES");
+
+        _mint(msg.sender, shares);
+
+        emit Deposit(msg.sender, msg.sender, amount, shares);
+
+        afterDeposit(amount, shares);
     }
 
     // ---------------------------------
@@ -62,10 +72,15 @@ contract ArbETHVault is ETHVault {
     function sweepToL1() public {
         // the benefit of using sending pure ether is that we might not have
         // to pick up the message on L1.
-        
+
+        // unwrap any weth
+        if (weth.balanceOf(address(this)) > 0) {
+            weth.withdraw(weth.balanceOf(address(this)));
+        }
+
         // withdraw to L1
         // receive() will then route the ether into the yield strategy
-        arbsys.withdrawEth(l1Target);
+        arbsys.withdrawEth{value: address(this).balance}(l1Target);
     }
 
     /// @notice Call sweepToL1() to trigger this function on L1

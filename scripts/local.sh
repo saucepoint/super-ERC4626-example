@@ -36,6 +36,10 @@ MAINNET_VAULT=$(echo $MAINNET_VAULT | sed -e 's/^"//' -e 's/"$//')
 echo "Mainnet Vault: $MAINNET_VAULT"
 export MAINNET_VAULT
 
+cast send $ARB_VAULT "setL1Target(address)" $MAINNET_VAULT \
+    --rpc-url $arbitrumRPC \
+    --private-key $arbPK
+
 # Simulates L1 --> L2 message (setTotalAssets)
 forge script scripts/2.SimL1ToL2.s.sol \
     --broadcast \

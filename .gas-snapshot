@@ -1,2 +1,5 @@
+ArbETHVaultTest:testWrapAndDeposit() (gas: 157893)
+ETHVaultTest:testDeposit() (gas: 82728)
+ETHVaultTest:testWithdraw() (gas: 93332)
 SampleContractTest:testFunc1() (gas: 534472)
 SampleContractTest:testFunc2() (gas: 534440)

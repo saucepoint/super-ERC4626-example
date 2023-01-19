@@ -3,16 +3,15 @@ pragma solidity ^0.8.13;
 
 import "arbos-precompiles/arbos/builtin/ArbSys.sol";
 import {ETHVault} from "../ETHVault.sol";
-import {WETH} from "solmate/tokens/WETH.sol";
-
-//import "@arbitrum/nitro-contracts/src/libraries/AddressAliasHelper.sol";
 
 contract ArbETHVault is ETHVault {
     uint256 internal _totalAssetsL1;
     address public l1Target;
-    ArbSys constant arbsys = ArbSys(address(100));
+    ArbSys internal arbsys = ArbSys(address(0x0000000000000000000000000000000000000064));
 
-    constructor(address _weth, address _l1Target) ETHVault(_weth) {
+    constructor(address _weth) ETHVault(_weth) {}
+
+    function setL1Target(address _l1Target) public {
         l1Target = _l1Target;
     }
 
@@ -32,9 +31,20 @@ contract ArbETHVault is ETHVault {
     // ---------------------------------
     // Entry mechanisms
     // ---------------------------------
-    function wrapAndDeposit() public payable {
-        WETH(payable(address(asset))).deposit{value: msg.value}();
-        deposit(msg.value, msg.sender);
+    function wrapAndDeposit() external payable returns (uint256 shares) {
+        uint256 amount = msg.value;
+        weth.deposit{value: msg.value}();
+
+        // logic taken from deposit(), but without the ERC20 transfer
+
+        // Check for rounding error since we round down in previewDeposit.
+        require((shares = previewDeposit(amount)) != 0, "ZERO_SHARES");
+
+        _mint(msg.sender, shares);
+
+        emit Deposit(msg.sender, msg.sender, amount, shares);
+
+        afterDeposit(amount, shares);
     }
 
     // ---------------------------------
@@ -52,16 +62,25 @@ contract ArbETHVault is ETHVault {
     // ---------------------------------
     /// @notice only L1 contract can set totalAssets
     function setTotalAssets(uint256 _totalAssets) public override {
-        require(msg.sender == l1Target, "only L1 contract can set totalAssets");
+        // TODO:
+        // require(msg.sender == l1Target, "only L1 contract can set totalAssets");
         // AddressAliasHelper.applyL1ToL2Alias(l1Target);
         _totalAssetsL1 = _totalAssets;
     }
 
-    /// sweeps the ether into the L1 contract
+    /// sweeps the asset (pure ether) into the L1 contract
     function sweepToL1() public {
-        bytes memory data = abi.encodeWithSelector(ETHVault.sweep.selector);
+        // the benefit of using sending pure ether is that we might not have
+        // to pick up the message on L1.
 
-        arbsys.sendTxToL1(l1Target, data);
+        // unwrap any weth
+        if (weth.balanceOf(address(this)) > 0) {
+            weth.withdraw(weth.balanceOf(address(this)));
+        }
+
+        // withdraw to L1
+        // receive() will then route the ether into the yield strategy
+        arbsys.withdrawEth{value: address(this).balance}(l1Target);
     }
 
     /// @notice Call sweepToL1() to trigger this function on L1

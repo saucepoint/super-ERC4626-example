@@ -29,28 +29,20 @@ interface IBridge {
         bytes32 messageDataHash
     );
 
-    event BridgeCallTriggered(
-        address indexed outbox,
-        address indexed destAddr,
-        uint256 amount,
-        bytes data
-    );
+    event BridgeCallTriggered(address indexed outbox, address indexed destAddr, uint256 amount, bytes data);
 
     event InboxToggle(address indexed inbox, bool enabled);
 
     event OutboxToggle(address indexed outbox, bool enabled);
 
-    function deliverMessageToInbox(
-        uint8 kind,
-        address sender,
-        bytes32 messageDataHash
-    ) external payable returns (uint256);
+    function deliverMessageToInbox(uint8 kind, address sender, bytes32 messageDataHash)
+        external
+        payable
+        returns (uint256);
 
-    function executeCall(
-        address destAddr,
-        uint256 amount,
-        bytes calldata data
-    ) external returns (bool success, bytes memory returnData);
+    function executeCall(address destAddr, uint256 amount, bytes calldata data)
+        external
+        returns (bool success, bytes memory returnData);
 
     // These are only callable by the admin
     function setInbox(address inbox, bool enabled) external;
@@ -104,12 +96,10 @@ interface IInbox is IMessageProvider {
         bytes calldata data
     ) external payable returns (uint256);
 
-    function sendL1FundedContractTransaction(
-        uint256 maxGas,
-        uint256 gasPriceBid,
-        address destAddr,
-        bytes calldata data
-    ) external payable returns (uint256);
+    function sendL1FundedContractTransaction(uint256 maxGas, uint256 gasPriceBid, address destAddr, bytes calldata data)
+        external
+        payable
+        returns (uint256);
 
     function createRetryableTicket(
         address destAddr,

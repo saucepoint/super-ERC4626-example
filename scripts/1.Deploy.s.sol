@@ -38,10 +38,11 @@ contract IntegrationTest is Script {
         );
         vm.stopBroadcast();
 
+        // HANDLED BY CAST:
         // configure arbitrum contract
-        vm.selectFork(arbFork);
-        vm.startBroadcast(ethAccount);
-        arbVault.setL1Target(address(mainnetVault));
-        vm.stopBroadcast();
+        // vm.selectFork(arbFork);
+        // vm.startBroadcast(ethAccount);
+        // arbVault.setL1Target(address(mainnetVault));
+        // vm.stopBroadcast();
     }
 }

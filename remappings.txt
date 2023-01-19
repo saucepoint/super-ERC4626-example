@@ -1,3 +1,4 @@
+@arbitrum/=node_modules/@arbitrum/
 @openzeppelin/=node_modules/@openzeppelin/
 arb-bridge-eth/=node_modules/arb-bridge-eth/
 arbos-precompiles/=node_modules/arbos-precompiles/

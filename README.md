@@ -8,8 +8,8 @@ Supercharging ERC-4626 tokens on Arbitrum:
 2) Tokens are *canonically L2* (Arbitrum) for **affordable** utilization:
     1) **Deposit into the vaults from L2**
     1) Transfer, trade, and exchange the tokens on L2
-    1) Exchange rate is correctly observable on L2
-    1) Use vaults as collateral in lending systems (???)
+    1) Exchange rate is correctly observable on L2 (with some latency)
+    1) Ideally use vaults in composable systems -- i.e. lending (?)
 
 ---
 
